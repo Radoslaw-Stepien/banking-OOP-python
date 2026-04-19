@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
+build/
+dist/
+*.egg-info/
+
+# Local organizational documents
+CHANGELOG.md
+informacje.md
+docs/plan-projektu.md
+docs/repo-structure.md
+
+# Private instructions and assistant metadata
+AGENTS.md
+**/AGENTS.md
+instrukcje*.md
+**/instrukcje*.md
