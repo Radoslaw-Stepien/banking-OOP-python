@@ -22,9 +22,6 @@ banking-oop-python/
 ├── tests/
 │   └── test_banking.py
 ├── docs/
-│   ├── repo-structure.md
-│   ├── notes/
-│   │   └── README.md
 │   └── uml/
 │       └── README.md
 └── examples/
@@ -37,8 +34,16 @@ banking-oop-python/
 - `src/banking/` to pakiet Python projektu.
 - `__main__.py` pelni role entry pointa. W Pythonie to bardziej naturalne niz pojedynczy top-level `main.py`.
 - `tests/` zawiera testy odseparowane od kodu produkcyjnego.
-- `docs/` trzyma opis architektury, UML i notatki do zaliczenia.
+- `docs/` trzyma publiczne materialy do UML i prezentacji architektury.
 - `examples/` jest miejscem na male moduly demonstracyjne dla tematow, ktore nie wejda naturalnie do rdzenia banku.
+
+## Aktualny model
+
+- `Account` obsluguje wplaty, wyplaty, walidacje kwoty i ochrone przed ujemnym saldem poczatkowym.
+- `SavingsAccount` dziedziczy po `Account` i uzywa `super().__init__(balance)`.
+- `CheckingAccount` dziedziczy po `Account`, przechowuje `overdraft_limit`, waliduje jego wartosc i nadpisuje `withdraw()`, aby pozwolic na zejscie ponizej zera w granicach limitu debetowego.
+- `Customer` przechowuje wiele kont i pozwala pobierac je po indeksie.
+- Biezace testy obejmuja przypadki pozytywne i negatywne dla `Account`, `SavingsAccount`, `CheckingAccount` i `Customer`.
 
 ## Jak uruchomic
 
@@ -56,7 +61,7 @@ PYTHONPATH=src python -m unittest discover -s tests
 
 ## Zakres na kolejne etapy
 
-1. Uporzadkowac obecny model `Account` i `Customer`.
-2. Dodac `SavingsAccount` i `CheckingAccount` z uzyciem dziedziczenia i `super()`.
-3. Dodac testy dla podstawowych przypadkow biznesowych.
-4. Rozbudowac projekt o `Bank`, `Transaction`, `Enum`, kontrakty i UML.
+1. Domknac podstawowe testy `CheckingAccount` dla pozostalych walidacji wyplaty.
+2. Dodac `Bank` jako warstwe agregujaca klientow i konta.
+3. Rozbudowac projekt o `Transaction`, `Enum`, kontrakty i dalsze elementy OOP.
+4. Uzupelnic publiczna dokumentacje i material UML do prezentacji projektu.

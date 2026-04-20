@@ -26,9 +26,37 @@ class Account:
     def get_balance(self) -> float:
         return self.__balance
 
+    def _change_balance(self, amount: float) -> None:
+        self.__balance += amount
+
     def __str__(self) -> str:
         return f"Wartosc konta = {self.__balance}"
 
+class SavingsAccount(Account):
+    """Konto oszczednosciowe."""
+
+    def __init__(self, balance: float = 0.0):
+        super().__init__(balance)
+
+class CheckingAccount(Account):
+    """Konto biezace."""
+    def __init__(self, balance: float = 0.0, overdraft_limit: float = 0.0):
+
+        if overdraft_limit < 0:
+            raise ValueError("Limit debetowy nie moze byc ujemny")
+        super().__init__(balance)
+        self.__overdraft_limit = overdraft_limit
+
+    def get_overdraft_limit(self) -> float:
+        return self.__overdraft_limit
+
+    def withdraw(self, amount: float) -> bool:
+        if amount <= 0:
+            return False
+        if amount > self.get_balance() + self.__overdraft_limit:
+            return False
+        self._change_balance(-amount)
+        return True
 
 class Customer:
     """Klasa reprezentujaca klienta banku."""
