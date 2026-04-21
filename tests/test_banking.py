@@ -65,6 +65,22 @@ class CheckingAccountTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             CheckingAccount(100.0, -10.0)
 
+    def test_checking_account_rejects_zero_withdraw(self) -> None:
+        account = CheckingAccount(100.0, 50.0)
+
+        result = account.withdraw(0)
+        
+        self.assertFalse(result)
+        self.assertEqual(account.get_balance(), 100.0)
+
+    def test_checking_account_rejects_negative_withdraw(self) -> None:
+        account = CheckingAccount(100.0, 50.0)
+
+        result = account.withdraw(-10.0)
+
+        self.assertFalse(result)
+        self.assertEqual(account.get_balance(), 100.0)
+
 class CustomerTests(unittest.TestCase):
     def test_customer_can_store_multiple_accounts(self) -> None:
         customer = Customer("Jane", "Simms")

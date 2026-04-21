@@ -43,7 +43,8 @@ banking-oop-python/
 - `SavingsAccount` dziedziczy po `Account` i uzywa `super().__init__(balance)`.
 - `CheckingAccount` dziedziczy po `Account`, przechowuje `overdraft_limit`, waliduje jego wartosc i nadpisuje `withdraw()`, aby pozwolic na zejscie ponizej zera w granicach limitu debetowego.
 - `Customer` przechowuje wiele kont i pozwala pobierac je po indeksie.
-- Biezace testy obejmuja przypadki pozytywne i negatywne dla `Account`, `SavingsAccount`, `CheckingAccount` i `Customer`.
+- Demo w `src/banking/__main__.py` pokazuje klienta z dwoma typami kont i proste operacje na obu obiektach.
+- Biezace testy obejmuja przypadki pozytywne i negatywne dla `Account`, `SavingsAccount`, `CheckingAccount` i `Customer`, w tym walidacje wyplaty `0` i liczby ujemnej dla `CheckingAccount`.
 
 ## Jak uruchomic
 
@@ -61,7 +62,6 @@ PYTHONPATH=src python -m unittest discover -s tests
 
 ## Zakres na kolejne etapy
 
-1. Domknac podstawowe testy `CheckingAccount` dla pozostalych walidacji wyplaty.
-2. Dodac `Bank` jako warstwe agregujaca klientow i konta.
-3. Rozbudowac projekt o `Transaction`, `Enum`, kontrakty i dalsze elementy OOP.
-4. Uzupelnic publiczna dokumentacje i material UML do prezentacji projektu.
+1. Dodac `Bank` jako warstwe agregujaca klientow i konta.
+2. Rozbudowac projekt o `Transaction`, `Enum`, kontrakty i dalsze elementy OOP.
+3. Uzupelnic publiczna dokumentacje i material UML do prezentacji projektu.

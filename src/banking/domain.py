@@ -89,3 +89,12 @@ class Customer:
             f"lastName='{self.__last_name}', "
             f"number_of_accounts={self.get_number_of_accounts()}}}"
         )
+
+class Bank:
+    """Klasa reprezentujaca bank."""
+
+    def __init__(self):
+        self.__customers = []
+
+    def add_customer(self, customer: Customer) -> None:
+        self.__customers.append(customer)
