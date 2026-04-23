@@ -1,6 +1,6 @@
 import unittest
 
-from banking import Account, Customer, SavingsAccount, CheckingAccount
+from banking import Account, Customer, SavingsAccount, CheckingAccount, Bank
 
 
 class AccountTests(unittest.TestCase):
@@ -94,6 +94,45 @@ class CustomerTests(unittest.TestCase):
         self.assertIs(customer.get_account(0), first)
         self.assertIs(customer.get_account(1), second)
 
+class BankTests(unittest.TestCase):
+    def test_bank_counts_customers(self) -> None:
+        bank = Bank()
+        customer = Customer("Jan", "Kowalski")
+
+        bank.add_customer(customer)
+
+        self.assertEqual(bank.get_number_of_customers(), 1)
+
+    def test_bank_returns_customer_by_index(self) -> None:
+        bank = Bank()
+        customer = Customer("Jan", "Kowalski")
+
+        bank.add_customer(customer)
+
+        self.assertIs(bank.get_customer(0), customer)
+        self.assertIsNone(bank.get_customer(1))
+
+    def test_transfer_moves_funds_between_accounts(self) -> None:
+        bank = Bank()
+        source = Account(100.0)
+        target = Account(50.0)
+
+        result = bank.transfer(source, target, 30.0)
+
+        self.assertTrue(result)
+        self.assertEqual(source.get_balance(), 70.0)
+        self.assertEqual(target.get_balance(), 80.0)
+
+    def test_transfer_fails_when_source_has_insufficient_funds(self) -> None:
+        bank = Bank()
+        source = Account(20.0)
+        target = Account(50.0)
+
+        result = bank.transfer(source, target, 100.0)
+
+        self.assertFalse(result)
+        self.assertEqual(source.get_balance(), 20.0)
+        self.assertEqual(target.get_balance(), 50.0)
 
 if __name__ == "__main__":
     unittest.main()

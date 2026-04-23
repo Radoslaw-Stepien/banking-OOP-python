@@ -98,3 +98,17 @@ class Bank:
 
     def add_customer(self, customer: Customer) -> None:
         self.__customers.append(customer)
+
+    def get_number_of_customers(self) -> int:
+        return len(self.__customers)
+
+    def get_customer(self, index: int) -> Customer | None:
+        if index < 0 or index >= len(self.__customers):
+            return None
+        return self.__customers[index]
+
+    def transfer(self, source: Account, target: Account, amount: float) -> bool:
+        if not source.withdraw(amount):
+            return False
+        target.deposit(amount)
+        return True
