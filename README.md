@@ -35,6 +35,10 @@ banking-oop-python/
 
 ## Model domenowy
 
+<p align="center">
+  <img src="docs/uml/banking.png" alt="Diagram klas" width="700"/>
+</p>
+
 | Klasa | Rola |
 |---|---|
 | `Account` | Abstrakcyjna klasa bazowa konta. Enkapsuluje saldo i historie transakcji. |
