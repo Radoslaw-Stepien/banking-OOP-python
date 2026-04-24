@@ -1,11 +1,11 @@
 import unittest
 
-from banking import Account, Customer, SavingsAccount, CheckingAccount, Bank
+from banking import Account, Customer, SavingsAccount, CheckingAccount, Bank, TransactionType
 
 
 class AccountTests(unittest.TestCase):
     def test_deposit_increases_balance(self) -> None:
-        account = Account(100.0)
+        account = SavingsAccount(100.0)
 
         result = account.deposit(50.0)
 
@@ -13,7 +13,7 @@ class AccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), 150.0)
 
     def test_deposit_rejects_non_positive_amount(self) -> None:
-        account = Account(100.0)
+        account = SavingsAccount(100.0)
 
         result = account.deposit(0)
 
@@ -21,7 +21,7 @@ class AccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), 100.0)
 
     def test_withdraw_rejects_amount_above_balance(self) -> None:
-        account = Account(100.0)
+        account = SavingsAccount(100.0)
 
         result = account.withdraw(150.0)
 
@@ -84,8 +84,8 @@ class CheckingAccountTests(unittest.TestCase):
 class CustomerTests(unittest.TestCase):
     def test_customer_can_store_multiple_accounts(self) -> None:
         customer = Customer("Jane", "Simms")
-        first = Account(100.0)
-        second = Account(250.0)
+        first = SavingsAccount(100.0)
+        second = SavingsAccount(250.0)
 
         customer.add_account(first)
         customer.add_account(second)
@@ -114,8 +114,8 @@ class BankTests(unittest.TestCase):
 
     def test_transfer_moves_funds_between_accounts(self) -> None:
         bank = Bank()
-        source = Account(100.0)
-        target = Account(50.0)
+        source = SavingsAccount(100.0)
+        target = SavingsAccount(50.0)
 
         result = bank.transfer(source, target, 30.0)
 
@@ -125,14 +125,54 @@ class BankTests(unittest.TestCase):
 
     def test_transfer_fails_when_source_has_insufficient_funds(self) -> None:
         bank = Bank()
-        source = Account(20.0)
-        target = Account(50.0)
+        source = SavingsAccount(20.0)
+        target = SavingsAccount(50.0)
 
         result = bank.transfer(source, target, 100.0)
 
         self.assertFalse(result)
         self.assertEqual(source.get_balance(), 20.0)
         self.assertEqual(target.get_balance(), 50.0)
+class TransactionTests(unittest.TestCase):
+    
+    def test_deposit_creates_transaction(self):
+        account = SavingsAccount(100.0)
+        account.deposit(50.0)
+        transactions = account.get_transactions()
+        self.assertEqual(len(transactions), 1)
+        self.assertEqual(transactions[0].get_type(), TransactionType.DEPOSIT)
+        self.assertEqual(transactions[0].get_amount(), 50.0)
+
+    def test_withdrawal_create_transactions(self):
+        account = SavingsAccount(100.0)
+        account.withdraw(30.0)
+        transactions = account.get_transactions()
+        self.assertEqual(len(transactions), 1)
+        self.assertEqual(transactions[0].get_type(), TransactionType.WITHDRAWAL)
+        self.assertEqual(transactions[0].get_amount(), 30.0)
+
+class MonthUpdateTests(unittest.TestCase):
+
+    def test_savings_account_applies_interest(self):
+        account = SavingsAccount(1200.0)
+        account.apply_monthly_update()
+        self.assertAlmostEqual(account.get_balance(), 1205.0, places=2)
+
+    def test_checking_account_applies_fee(self):
+        account = CheckingAccount(100.0)
+        account.apply_monthly_update()
+        self.assertEqual(account.get_balance(), 95.0)
+
+class StaticMethodTests(unittest.TestCase):
+
+    def test_is_valid_amount_accepts_positives(self):
+        self.assertTrue(Account.is_valid_amount(10.0))
+
+    def test_is_valid_amount_rejects_zero(self):
+        self.assertFalse(Account.is_valid_amount(0))
+
+    def test_is_valid_amount_rejects_negative(self):
+        self.assertFalse(Account.is_valid_amount(-5.0))
 
 if __name__ == "__main__":
     unittest.main()

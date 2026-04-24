@@ -1,30 +1,59 @@
 """Podstawowy model domenowy projektu bankowego."""
 
+from abc import ABC, abstractmethod
+from enum import Enum
 
-class Account:
+class TransactionType(Enum):
+    DEPOSIT = "deposit"
+    WITHDRAWAL = "withdrawal"
+
+class Transaction:
+    def __init__(self, transaction_type: TransactionType, amount: float):
+        self.__type = transaction_type
+        self.__amount = amount
+
+    def get_type(self) -> TransactionType:
+        return self.__type
+
+    def get_amount(self) -> float:
+        return self.__amount
+
+class Account(ABC):
     """Klasa reprezentujaca konto bankowe."""
 
     def __init__(self, balance: float = 0.0):
         if balance < 0:
             raise ValueError("Saldo poczatkowe nie moze byc ujemne")
         self.__balance = balance
+        self.__transactions: list[Transaction] = []
+
+    @staticmethod
+    def is_valid_amount(amount: float) -> bool:
+        return amount > 0
 
     def deposit(self, amount: float) -> bool:
-        if amount <= 0:
+        if not Account.is_valid_amount(amount):
             return False
+            
         self.__balance += amount
+        self.__transactions.append(Transaction(TransactionType.DEPOSIT, amount))
         return True
 
     def withdraw(self, amount: float) -> bool:
-        if amount <= 0:
+        if not Account.is_valid_amount(amount):
             return False
+
         if amount > self.__balance:
             return False
         self.__balance -= amount
+        self.__transactions.append(Transaction(TransactionType.WITHDRAWAL, amount))
         return True
 
     def get_balance(self) -> float:
         return self.__balance
+
+    def get_transactions(self) -> list[Transaction]:
+        return list(self.__transactions)
 
     def _change_balance(self, amount: float) -> None:
         self.__balance += amount
@@ -32,11 +61,18 @@ class Account:
     def __str__(self) -> str:
         return f"Wartosc konta = {self.__balance}"
 
+    @abstractmethod
+    def apply_monthly_update(self) -> None:
+        pass
+
 class SavingsAccount(Account):
     """Konto oszczednosciowe."""
 
     def __init__(self, balance: float = 0.0):
         super().__init__(balance)
+
+    def apply_monthly_update(self) -> None:
+        self._change_balance(self.get_balance() * 0.05 / 12)
 
 class CheckingAccount(Account):
     """Konto biezace."""
@@ -57,6 +93,9 @@ class CheckingAccount(Account):
             return False
         self._change_balance(-amount)
         return True
+
+    def apply_monthly_update(self) -> None:
+        self._change_balance(-5.0)
 
 class Customer:
     """Klasa reprezentujaca klienta banku."""
