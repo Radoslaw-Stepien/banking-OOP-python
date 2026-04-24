@@ -1,50 +1,6 @@
 # Banking OOP Python
 
-Projekt zaliczeniowy z programowania obiektowego w Pythonie. Repozytorium jest przygotowane jako osobny projekt do dalszego rozwoju, a nie jako kopia całego repo kursowego.
-
-## Cel
-
-- zbudowac czytelny mini-system bankowy w Pythonie,
-- pokazac najwazniejsze elementy OOP wymagane na zajeciach,
-- utrzymac porzadna strukture repozytorium gotowa do prezentacji.
-
-## Struktura repo
-
-```text
-banking-oop-python/
-├── README.md
-├── pyproject.toml
-├── src/
-│   └── banking/
-│       ├── __init__.py
-│       ├── __main__.py
-│       └── domain.py
-├── tests/
-│   └── test_banking.py
-├── docs/
-│   └── uml/
-│       └── README.md
-└── examples/
-    └── README.md
-```
-
-## Dlaczego tak
-
-- `src/` trzyma kod aplikacji i oddziela go od dokumentacji oraz testow.
-- `src/banking/` to pakiet Python projektu.
-- `__main__.py` pelni role entry pointa. W Pythonie to bardziej naturalne niz pojedynczy top-level `main.py`.
-- `tests/` zawiera testy odseparowane od kodu produkcyjnego.
-- `docs/` trzyma publiczne materialy do UML i prezentacji architektury.
-- `examples/` jest miejscem na male moduly demonstracyjne dla tematow, ktore nie wejda naturalnie do rdzenia banku.
-
-## Aktualny model
-
-- `Account` obsluguje wplaty, wyplaty, walidacje kwoty i ochrone przed ujemnym saldem poczatkowym.
-- `SavingsAccount` dziedziczy po `Account` i uzywa `super().__init__(balance)`.
-- `CheckingAccount` dziedziczy po `Account`, przechowuje `overdraft_limit`, waliduje jego wartosc i nadpisuje `withdraw()`, aby pozwolic na zejscie ponizej zera w granicach limitu debetowego.
-- `Customer` przechowuje wiele kont i pozwala pobierac je po indeksie.
-- Demo w `src/banking/__main__.py` pokazuje klienta z dwoma typami kont i proste operacje na obu obiektach.
-- Biezace testy obejmuja przypadki pozytywne i negatywne dla `Account`, `SavingsAccount`, `CheckingAccount` i `Customer`, w tym walidacje wyplaty `0` i liczby ujemnej dla `CheckingAccount`.
+Projekt zaliczeniowy z programowania obiektowego w Pythonie. Mini-system bankowy pokazujacy kluczowe elementy OOP: dziedziczenie, enkapsulacje, polimorfizm, kompozycje, agregacje i kontrakty.
 
 ## Jak uruchomic
 
@@ -60,8 +16,51 @@ Testy:
 PYTHONPATH=src python -m unittest discover -s tests
 ```
 
-## Zakres na kolejne etapy
+## Struktura repo
 
-1. Dodac `Bank` jako warstwe agregujaca klientow i konta.
-2. Rozbudowac projekt o `Transaction`, `Enum`, kontrakty i dalsze elementy OOP.
-3. Uzupelnic publiczna dokumentacje i material UML do prezentacji projektu.
+```text
+banking-oop-python/
+├── src/banking/
+│   ├── domain.py       # wszystkie klasy domenowe
+│   ├── __init__.py     # publiczny interfejs pakietu
+│   └── __main__.py     # demo / entry point
+├── tests/
+│   └── test_banking.py # testy jednostkowe
+├── docs/
+│   ├── uml/            # diagram klas PlantUML
+│   ├── decyzje-architektoniczne.md
+│   └── plan-projektu.md
+└── examples/           # przyklady tematow pobocznych (wielodziedziczenie, singleton)
+```
+
+## Model domenowy
+
+| Klasa | Rola |
+|---|---|
+| `Account` | Abstrakcyjna klasa bazowa konta. Enkapsuluje saldo i historie transakcji. |
+| `SavingsAccount` | Konto oszczednosciowe. Nalicza miesieczne odsetki (5% rocznie). |
+| `CheckingAccount` | Konto biezace z limitem debetowym. Pobiera miesieczna oplate. |
+| `Transaction` | Pojedyncza operacja — typ (Enum) i kwota. Kompozycja z Account. |
+| `TransactionType` | Enum: `DEPOSIT` / `WITHDRAWAL`. |
+| `Customer` | Klient przechowujacy liste kont. |
+| `Bank` | Agreguje klientow. Realizuje przelewy i generuje raport sald. |
+
+## Pokryte tematy OOP
+
+- dziedziczenie i `super()` — `SavingsAccount`, `CheckingAccount` po `Account`
+- enkapsulacja — prywatne pola `__balance`, `__customers`, `__transactions`
+- polimorfizm — `apply_monthly_update()` dziala inaczej w kazdej klasie konta
+- abstrakcyjna klasa bazowa (ABC) — `Account` wymusza implementacje `apply_monthly_update()`
+- kompozycja — `Account` zawiera liste obiektow `Transaction`
+- agregacja — `Bank` zawiera liste `Customer`, `Customer` zawiera liste `Account`
+- Enum — `TransactionType`
+- metoda statyczna — `Account.is_valid_amount()`
+- kolekcje `list` i `dict` — historia transakcji, lista klientow, raport sald
+
+## Testy
+
+```
+Ran 25 tests in 0.001s OK
+```
+
+Testy pokrywaja przypadki pozytywne i negatywne dla kazdej klasy.

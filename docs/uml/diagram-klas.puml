@@ -1,0 +1,68 @@
+@startuml banking
+
+skinparam classAttributeIconSize 0
+
+enum TransactionType {
+    DEPOSIT
+    WITHDRAWAL
+}
+
+class Transaction {
+    - __type: TransactionType
+    - __amount: float
+    + get_type(): TransactionType
+    + get_amount(): float
+}
+
+abstract class Account {
+    - __balance: float
+    - __transactions: list[Transaction]
+    + {static} is_valid_amount(amount: float): bool
+    + deposit(amount: float): bool
+    + withdraw(amount: float): bool
+    + get_balance(): float
+    + get_transactions(): list[Transaction]
+    # _change_balance(amount: float): void
+    + {abstract} apply_monthly_update(): void
+}
+
+class SavingsAccount {
+    + apply_monthly_update(): void
+}
+
+class CheckingAccount {
+    - __overdraft_limit: float
+    + get_overdraft_limit(): float
+    + withdraw(amount: float): bool
+    + apply_monthly_update(): void
+}
+
+class Customer {
+    - __first_name: str
+    - __last_name: str
+    - __accounts: list[Account]
+    + add_account(account: Account): void
+    + get_account(index: int): Account
+    + get_number_of_accounts(): int
+    + get_first_name(): str
+    + get_last_name(): str
+}
+
+class Bank {
+    - __customers: list[Customer]
+    + add_customer(customer: Customer): void
+    + get_customer(index: int): Customer
+    + get_number_of_customers(): int
+    + transfer(source: Account, target: Account, amount: float): bool
+    + get_total_balance(): float
+    + generate_report(): dict
+}
+
+SavingsAccount --|> Account
+CheckingAccount --|> Account
+Account *-- Transaction : contains
+Transaction --> TransactionType : uses
+Customer o-- Account : has
+Bank o-- Customer : manages
+
+@enduml
