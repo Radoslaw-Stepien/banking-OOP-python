@@ -30,7 +30,7 @@ banking-oop-python/
 │   ├── uml/            # diagram klas PlantUML
 │   ├── decyzje-architektoniczne.md
 │   └── plan-projektu.md
-└── examples/           # przyklady tematow pobocznych (wielodziedziczenie, singleton)
+└── examples/           # przyklady tematow pobocznych (wielodziedziczenie, singleton, Protocol)
 ```
 
 ## Model domenowy
@@ -60,6 +60,9 @@ banking-oop-python/
 - Enum — `TransactionType`
 - metoda statyczna — `Account.is_valid_amount()`
 - kolekcje `list` i `dict` — historia transakcji, lista klientow, raport sald
+- wielodziedziczenie i Mixin — `examples/wielodziedziczenie.py`
+- singleton (`__new__`) — `examples/singleton.py`
+- `typing.Protocol` — `examples/protocol_example.py`
 
 ## Testy
 
