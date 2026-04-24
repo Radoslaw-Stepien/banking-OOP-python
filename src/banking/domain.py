@@ -151,3 +151,20 @@ class Bank:
             return False
         target.deposit(amount)
         return True
+    
+    def get_total_balance(self) -> float:
+        total = 0.0
+        for customer in self.__customers:
+            for i in range(customer.get_number_of_accounts()):
+                total += customer.get_account(i).get_balance()
+        return total
+
+    def generate_report(self) -> dict[str, float]:
+        report = {}
+        for customer in self.__customers:
+            name = f"{customer.get_first_name()} {customer.get_last_name()}"
+            total = 0.0
+            for i in range(customer.get_number_of_accounts()):
+                total += customer.get_account(i).get_balance()
+            report[name] = total
+        return report

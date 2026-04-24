@@ -133,6 +133,27 @@ class BankTests(unittest.TestCase):
         self.assertFalse(result)
         self.assertEqual(source.get_balance(), 20.0)
         self.assertEqual(target.get_balance(), 50.0)
+
+    def test_get_total_balance_sums_all_accounts(self):
+        bank = Bank()
+        customer = Customer("Jan", "Kowalski")
+        customer.add_account(SavingsAccount(100.0))
+        customer.add_account(CheckingAccount(50.0))
+        bank.add_customer(customer)
+
+        self.assertEqual(bank.get_total_balance(), 150.0)
+
+    def test_generate_report_returns_balance_per_customer(self):
+        bank = Bank()
+        customer = Customer("Jan", "Kowalski")
+        customer.add_account(SavingsAccount(200.0))
+        bank.add_customer(customer)
+
+        report = bank.generate_report()
+
+        self.assertIn("Jan Kowalski", report)
+        self.assertEqual(report["Jan Kowalski"], 200.0)
+
 class TransactionTests(unittest.TestCase):
     
     def test_deposit_creates_transaction(self):
