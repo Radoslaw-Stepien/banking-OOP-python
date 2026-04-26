@@ -5,6 +5,7 @@ from banking import Account, Customer, SavingsAccount, CheckingAccount, Bank, Tr
 
 class AccountTests(unittest.TestCase):
     def test_deposit_increases_balance(self) -> None:
+        """Wplata dodatnia zwieksza saldo i zwraca True."""
         account = SavingsAccount(100.0)
 
         result = account.deposit(50.0)
@@ -13,6 +14,7 @@ class AccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), 150.0)
 
     def test_deposit_rejects_non_positive_amount(self) -> None:
+        """Wplata zerowa lub ujemna jest odrzucana — saldo bez zmian."""
         account = SavingsAccount(100.0)
 
         result = account.deposit(0)
@@ -21,6 +23,7 @@ class AccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), 100.0)
 
     def test_withdraw_rejects_amount_above_balance(self) -> None:
+        """Wyplata powyzej salda jest odrzucana — saldo bez zmian."""
         account = SavingsAccount(100.0)
 
         result = account.withdraw(150.0)
@@ -30,22 +33,26 @@ class AccountTests(unittest.TestCase):
 
 class SavingsAccountTests(unittest.TestCase):
     def test_savings_account_keeps_initial_balance(self) -> None:
+        """Saldo poczatkowe jest zachowane po utworzeniu konta."""
         account = SavingsAccount(200.0)
 
         self.assertEqual(account.get_balance(), 200.0)
 
     def test_savings_account_rejects_negative_initial_balance(self) -> None:
+        """Ujemne saldo poczatkowe rzuca ValueError."""
         with self.assertRaises(ValueError):
             SavingsAccount(-10.0)
 
 class CheckingAccountTests(unittest.TestCase):
     def test_checking_account_stores_overdraft_limit(self) -> None:
+        """Konto biezace przechowuje saldo i limit debetowy."""
         account = CheckingAccount(100.0, 50.0)
 
         self.assertEqual(account.get_balance(), 100.0)
         self.assertEqual(account.get_overdraft_limit(), 50.0)
 
     def test_checking_account_allow_withdraw_within_overdraft_limit(self) -> None:
+        """Wyplata w granicach salda + limitu jest dozwolona — saldo moze byc ujemne."""
         account = CheckingAccount(100.0, 50.0)
 
         result = account.withdraw(120.0)
@@ -54,6 +61,7 @@ class CheckingAccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), -20.0)
 
     def test_checking_account_rejects_withdraw_above_overdraft_limit(self) -> None:
+        """Wyplata powyzej salda + limitu jest odrzucana."""
         account = CheckingAccount(100.0, 50.0)
 
         result = account.withdraw(160.0)
@@ -62,18 +70,21 @@ class CheckingAccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), 100.0)
 
     def test_checking_account_rejects_negative_overdraft_limit(self) -> None:
+        """Ujemny limit debetowy rzuca ValueError."""
         with self.assertRaises(ValueError):
             CheckingAccount(100.0, -10.0)
 
     def test_checking_account_rejects_zero_withdraw(self) -> None:
+        """Wyplata zerowa jest odrzucana."""
         account = CheckingAccount(100.0, 50.0)
 
         result = account.withdraw(0)
-        
+
         self.assertFalse(result)
         self.assertEqual(account.get_balance(), 100.0)
 
     def test_checking_account_rejects_negative_withdraw(self) -> None:
+        """Wyplata ujemna jest odrzucana."""
         account = CheckingAccount(100.0, 50.0)
 
         result = account.withdraw(-10.0)
@@ -83,6 +94,7 @@ class CheckingAccountTests(unittest.TestCase):
 
 class CustomerTests(unittest.TestCase):
     def test_customer_can_store_multiple_accounts(self) -> None:
+        """Klient przechowuje wiele kont i zwraca je po indeksie."""
         customer = Customer("Jane", "Simms")
         first = SavingsAccount(100.0)
         second = SavingsAccount(250.0)
@@ -96,6 +108,7 @@ class CustomerTests(unittest.TestCase):
 
 class BankTests(unittest.TestCase):
     def test_bank_counts_customers(self) -> None:
+        """Bank poprawnie zlicza dodanych klientow."""
         bank = Bank()
         customer = Customer("Jan", "Kowalski")
 
@@ -104,6 +117,7 @@ class BankTests(unittest.TestCase):
         self.assertEqual(bank.get_number_of_customers(), 1)
 
     def test_bank_returns_customer_by_index(self) -> None:
+        """Bank zwraca klienta po indeksie; None dla indeksu poza zakresem."""
         bank = Bank()
         customer = Customer("Jan", "Kowalski")
 
@@ -113,6 +127,7 @@ class BankTests(unittest.TestCase):
         self.assertIsNone(bank.get_customer(1))
 
     def test_transfer_moves_funds_between_accounts(self) -> None:
+        """Przelew przenosi srodki: zrodlo traci, cel zyskuje."""
         bank = Bank()
         source = SavingsAccount(100.0)
         target = SavingsAccount(50.0)
@@ -124,6 +139,7 @@ class BankTests(unittest.TestCase):
         self.assertEqual(target.get_balance(), 80.0)
 
     def test_transfer_fails_when_source_has_insufficient_funds(self) -> None:
+        """Przelew jest odrzucany gdy zrodlo nie ma wystarczajacych srodkow."""
         bank = Bank()
         source = SavingsAccount(20.0)
         target = SavingsAccount(50.0)
@@ -135,6 +151,7 @@ class BankTests(unittest.TestCase):
         self.assertEqual(target.get_balance(), 50.0)
 
     def test_get_total_balance_sums_all_accounts(self):
+        """Laczne saldo banku sumuje wszystkie konta wszystkich klientow."""
         bank = Bank()
         customer = Customer("Jan", "Kowalski")
         customer.add_account(SavingsAccount(100.0))
@@ -144,6 +161,7 @@ class BankTests(unittest.TestCase):
         self.assertEqual(bank.get_total_balance(), 150.0)
 
     def test_generate_report_returns_balance_per_customer(self):
+        """Raport zawiera laczne saldo per klient jako slownik nazwisko -> kwota."""
         bank = Bank()
         customer = Customer("Jan", "Kowalski")
         customer.add_account(SavingsAccount(200.0))
@@ -155,8 +173,9 @@ class BankTests(unittest.TestCase):
         self.assertEqual(report["Jan Kowalski"], 200.0)
 
 class TransactionTests(unittest.TestCase):
-    
+
     def test_deposit_creates_transaction(self):
+        """Wplata tworzy rekord transakcji typu DEPOSIT z prawidlowa kwota."""
         account = SavingsAccount(100.0)
         account.deposit(50.0)
         transactions = account.get_transactions()
@@ -165,6 +184,7 @@ class TransactionTests(unittest.TestCase):
         self.assertEqual(transactions[0].get_amount(), 50.0)
 
     def test_withdrawal_create_transactions(self):
+        """Wyplata tworzy rekord transakcji typu WITHDRAWAL z prawidlowa kwota."""
         account = SavingsAccount(100.0)
         account.withdraw(30.0)
         transactions = account.get_transactions()
@@ -175,11 +195,13 @@ class TransactionTests(unittest.TestCase):
 class MonthUpdateTests(unittest.TestCase):
 
     def test_savings_account_applies_interest(self):
+        """Konto oszczednosciowe nalicza miesieczne odsetki (5% rocznie)."""
         account = SavingsAccount(1200.0)
         account.apply_monthly_update()
         self.assertAlmostEqual(account.get_balance(), 1205.0, places=2)
 
     def test_checking_account_applies_fee(self):
+        """Konto biezace pobiera miesieczna oplate 5 zl."""
         account = CheckingAccount(100.0)
         account.apply_monthly_update()
         self.assertEqual(account.get_balance(), 95.0)
@@ -187,12 +209,15 @@ class MonthUpdateTests(unittest.TestCase):
 class StaticMethodTests(unittest.TestCase):
 
     def test_is_valid_amount_accepts_positives(self):
+        """Kwota dodatnia jest uznawana za poprawna."""
         self.assertTrue(Account.is_valid_amount(10.0))
 
     def test_is_valid_amount_rejects_zero(self):
+        """Zero jest niepoprawna kwota operacji."""
         self.assertFalse(Account.is_valid_amount(0))
 
     def test_is_valid_amount_rejects_negative(self):
+        """Kwota ujemna jest niepoprawna."""
         self.assertFalse(Account.is_valid_amount(-5.0))
 
 if __name__ == "__main__":

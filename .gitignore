@@ -11,6 +11,7 @@ dist/
 *.egg-info/
 
 # Local organizational documents
+omowienie-projektu.md
 CHANGELOG.md
 informacje.md
 docs/plan-projektu.md

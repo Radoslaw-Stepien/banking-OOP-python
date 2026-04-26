@@ -39,15 +39,15 @@ banking-oop-python/
   <img src="docs/uml/banking.png" alt="Diagram klas" width="700"/>
 </p>
 
-| Klasa | Rola |
-|---|---|
-| `Account` | Abstrakcyjna klasa bazowa konta. Enkapsuluje saldo i historie transakcji. |
-| `SavingsAccount` | Konto oszczednosciowe. Nalicza miesieczne odsetki (5% rocznie). |
-| `CheckingAccount` | Konto biezace z limitem debetowym. Pobiera miesieczna oplate. |
-| `Transaction` | Pojedyncza operacja — typ (Enum) i kwota. Kompozycja z Account. |
-| `TransactionType` | Enum: `DEPOSIT` / `WITHDRAWAL`. |
-| `Customer` | Klient przechowujacy liste kont. |
-| `Bank` | Agreguje klientow. Realizuje przelewy i generuje raport sald. |
+| Klasa             | Rola                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| `Account`         | Abstrakcyjna klasa bazowa konta. Enkapsuluje saldo i historie transakcji. |
+| `SavingsAccount`  | Konto oszczednosciowe. Nalicza miesieczne odsetki (5% rocznie).           |
+| `CheckingAccount` | Konto biezace z limitem debetowym. Pobiera miesieczna oplate.             |
+| `Transaction`     | Pojedyncza operacja — typ (Enum) i kwota. Kompozycja z Account.           |
+| `TransactionType` | Enum: `DEPOSIT` / `WITHDRAWAL`.                                           |
+| `Customer`        | Klient przechowujacy liste kont.                                          |
+| `Bank`            | Agreguje klientow. Realizuje przelewy i generuje raport sald.             |
 
 ## Pokryte tematy OOP
 
@@ -66,8 +66,18 @@ banking-oop-python/
 
 ## Testy
 
-```
-Ran 25 tests in 0.001s OK
+```bash
+PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-Testy pokrywaja przypadki pozytywne i negatywne dla kazdej klasy.
+| Klasa testow           | Co weryfikuje                                                 | Liczba testow |
+| ---------------------- | ------------------------------------------------------------- | :-----------: |
+| `AccountTests`         | wplata i wyplata — warunki poprawne i bledne                  |       3       |
+| `SavingsAccountTests`  | saldo poczatkowe, walidacja przy tworzeniu                    |       2       |
+| `CheckingAccountTests` | limit debetowy, wyplata w granicach limitu i poza nim         |       6       |
+| `CustomerTests`        | przechowywanie wielu kont, dostep po indeksie                 |       1       |
+| `BankTests`            | liczenie klientow, przelew, raport sald                       |       6       |
+| `TransactionTests`     | historia operacji — typ i kwota transakcji                    |       2       |
+| `MonthUpdateTests`     | miesieczne odsetki (SavingsAccount), oplata (CheckingAccount) |       2       |
+| `StaticMethodTests`    | walidacja kwoty — metoda statyczna `is_valid_amount`          |       3       |
+| **Razem**              |                                                               |    **25**     |
