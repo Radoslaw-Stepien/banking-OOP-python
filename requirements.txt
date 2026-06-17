@@ -1,0 +1,7 @@
+# Projekt nie ma zewnętrznych zależności.
+# Korzysta wyłącznie z biblioteki standardowej Pythona:
+#   - tkinter  (GUI)
+#   - json     (zapis/odczyt pliku)
+#   - abc      (klasy abstrakcyjne)
+#   - enum     (TransactionType)
+#   - unittest (testy)

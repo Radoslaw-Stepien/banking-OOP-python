@@ -1,36 +1,63 @@
 # Banking OOP Python
 
-Projekt zaliczeniowy z programowania obiektowego w Pythonie. Mini-system bankowy pokazujacy kluczowe elementy OOP: dziedziczenie, enkapsulacje, polimorfizm, kompozycje, agregacje i kontrakty.
+Projekt zaliczeniowy z programowania obiektowego w Pythonie. Mini-system bankowy pokazujący kluczowe elementy OOP: dziedziczenie, enkapsulację, polimorfizm, kompozycję, agregację i kontrakty. Uzupełniony o zapis/odczyt stanu do pliku JSON, obsługę wyjątków i graficzny interfejs użytkownika (tkinter).
 
-## Jak uruchomic
+## Wymagania
 
-Demo:
+- Python 3.10 lub nowszy
+- Brak zewnętrznych zależności — projekt korzysta wyłącznie z biblioteki standardowej Pythona (`tkinter`, `json`, `abc`, `enum`, `unittest`)
+
+## Jak uruchomić
+
+### 1. Sklonuj repozytorium
 
 ```bash
-PYTHONPATH=src python -m banking
+git clone <url-repozytorium>
+cd banking-oop-python
 ```
 
-Testy:
+### 2. Zainstaluj pakiet (jednorazowo)
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests
+pip install -e .
 ```
 
-## Struktura repo
+To polecenie rejestruje pakiet `banking` w środowisku Pythona. Wymagane tylko raz — po każdej zmianie kodu nie trzeba tego powtarzać.
+
+### 3. Uruchom aplikację
+
+```bash
+python -m banking
+```
+
+Otworzy się okno graficzne z załadowanymi danymi demonstracyjnymi (dwóch klientów, trzy konta).
+
+### 4. Uruchom testy
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Oczekiwany wynik: **33 testy, wszystkie przechodzą (OK)**.
+
+## Struktura repozytorium
 
 ```text
 banking-oop-python/
 ├── src/banking/
 │   ├── domain.py       # wszystkie klasy domenowe
+│   ├── gui.py          # graficzny interfejs użytkownika (tkinter)
 │   ├── __init__.py     # publiczny interfejs pakietu
-│   └── __main__.py     # demo / entry point
+│   └── __main__.py     # entry point — uruchamia GUI
 ├── tests/
-│   └── test_banking.py # testy jednostkowe
+│   └── test_banking.py # testy jednostkowe (33 testy)
 ├── docs/
 │   ├── uml/            # diagram klas PlantUML
 │   ├── decyzje-architektoniczne.md
 │   └── plan-projektu.md
-└── examples/           # przyklady tematow pobocznych (wielodziedziczenie, singleton, Protocol)
+├── examples/           # przykłady tematów pobocznych (wielodziedziczenie, singleton, Protocol)
+├── pyproject.toml      # konfiguracja pakietu
+└── requirements.txt    # lista zależności (brak zewnętrznych)
 ```
 
 ## Model domenowy
@@ -39,27 +66,32 @@ banking-oop-python/
   <img src="docs/uml/banking.png" alt="Diagram klas" width="700"/>
 </p>
 
-| Klasa             | Rola                                                                      |
-| ----------------- | ------------------------------------------------------------------------- |
-| `Account`         | Abstrakcyjna klasa bazowa konta. Enkapsuluje saldo i historie transakcji. |
-| `SavingsAccount`  | Konto oszczednosciowe. Nalicza miesieczne odsetki (5% rocznie).           |
-| `CheckingAccount` | Konto biezace z limitem debetowym. Pobiera miesieczna oplate.             |
-| `Transaction`     | Pojedyncza operacja — typ (Enum) i kwota. Kompozycja z Account.           |
-| `TransactionType` | Enum: `DEPOSIT` / `WITHDRAWAL`.                                           |
-| `Customer`        | Klient przechowujacy liste kont.                                          |
-| `Bank`            | Agreguje klientow. Realizuje przelewy i generuje raport sald.             |
+| Klasa             | Rola                                                                       |
+| ----------------- | -------------------------------------------------------------------------- |
+| `Account`         | Abstrakcyjna klasa bazowa konta. Enkapsuluje saldo i historię transakcji.  |
+| `SavingsAccount`  | Konto oszczędnościowe. Nalicza miesięczne odsetki (5% rocznie).            |
+| `CheckingAccount` | Konto bieżące z limitem debetowym. Pobiera miesięczną opłatę.              |
+| `Transaction`     | Pojedyncza operacja — typ (Enum) i kwota. Kompozycja z Account.            |
+| `TransactionType` | Enum: `DEPOSIT` / `WITHDRAWAL`.                                            |
+| `Customer`        | Klient przechowujący listę kont.                                           |
+| `Bank`            | Agreguje klientów. Realizuje przelewy, zapis/odczyt stanu i raport sald.   |
+| `BankApp`         | Główne okno GUI (tkinter). Łączy widok z modelem domenowym.                |
 
 ## Pokryte tematy OOP
 
 - dziedziczenie i `super()` — `SavingsAccount`, `CheckingAccount` po `Account`
 - enkapsulacja — prywatne pola `__balance`, `__customers`, `__transactions`
-- polimorfizm — `apply_monthly_update()` dziala inaczej w kazdej klasie konta
-- abstrakcyjna klasa bazowa (ABC) — `Account` wymusza implementacje `apply_monthly_update()`
-- kompozycja — `Account` zawiera liste obiektow `Transaction`
-- agregacja — `Bank` zawiera liste `Customer`, `Customer` zawiera liste `Account`
+- polimorfizm — `apply_monthly_update()` działa inaczej w każdej klasie konta
+- abstrakcyjna klasa bazowa (ABC) — `Account` wymusza implementację `apply_monthly_update()`
+- kompozycja — `Account` zawiera listę obiektów `Transaction`
+- agregacja — `Bank` zawiera listę `Customer`, `Customer` zawiera listę `Account`
 - Enum — `TransactionType`
 - metoda statyczna — `Account.is_valid_amount()`
-- kolekcje `list` i `dict` — historia transakcji, lista klientow, raport sald
+- metoda chroniona — `Account._record_transaction()` dostępna dla podklas
+- kolekcje `list` i `dict` — historia transakcji, lista klientów, raport sald
+- obsługa wyjątków — `ValueError`, `FileNotFoundError`, `IOError`, `json.JSONDecodeError`
+- serializacja — `to_dict()` w każdej klasie, zapis/odczyt JSON (`save_to_file`, `load_from_file`)
+- GUI (tkinter) — `BankApp` dziedziczące po `tk.Tk`, wzorzec MVC (model = `domain.py`, widok = `gui.py`)
 - wielodziedziczenie i Mixin — `examples/wielodziedziczenie.py`
 - singleton (`__new__`) — `examples/singleton.py`
 - `typing.Protocol` — `examples/protocol_example.py`
@@ -67,17 +99,18 @@ banking-oop-python/
 ## Testy
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests -v
+python -m unittest discover -s tests -v
 ```
 
-| Klasa testow           | Co weryfikuje                                                 | Liczba testow |
-| ---------------------- | ------------------------------------------------------------- | :-----------: |
-| `AccountTests`         | wplata i wyplata — warunki poprawne i bledne                  |       3       |
-| `SavingsAccountTests`  | saldo poczatkowe, walidacja przy tworzeniu                    |       2       |
-| `CheckingAccountTests` | limit debetowy, wyplata w granicach limitu i poza nim         |       6       |
-| `CustomerTests`        | przechowywanie wielu kont, dostep po indeksie                 |       1       |
-| `BankTests`            | liczenie klientow, przelew, raport sald                       |       6       |
-| `TransactionTests`     | historia operacji — typ i kwota transakcji                    |       2       |
-| `MonthUpdateTests`     | miesieczne odsetki (SavingsAccount), oplata (CheckingAccount) |       2       |
-| `StaticMethodTests`    | walidacja kwoty — metoda statyczna `is_valid_amount`          |       3       |
-| **Razem**              |                                                               |    **25**     |
+| Klasa testów           | Co weryfikuje                                                        | Liczba testów |
+| ---------------------- | -------------------------------------------------------------------- | :-----------: |
+| `AccountTests`         | wpłata i wypłata — `ValueError` przy błędnych danych                 |       3       |
+| `SavingsAccountTests`  | saldo początkowe, walidacja przy tworzeniu                           |       2       |
+| `CheckingAccountTests` | limit debetowy, wypłata w granicach limitu, historia transakcji      |       7       |
+| `CustomerTests`        | przechowywanie kont, dostęp po indeksie, `get_accounts()`            |       2       |
+| `BankTests`            | liczenie klientów, `get_customers()`, przelew, raport sald           |       6       |
+| `TransactionTests`     | historia operacji — typ i kwota transakcji                           |       2       |
+| `MonthUpdateTests`     | miesięczne odsetki (`SavingsAccount`), opłata (`CheckingAccount`)    |       2       |
+| `StaticMethodTests`    | walidacja kwoty — metoda statyczna `is_valid_amount`                 |       3       |
+| `FileIOTests`          | zapis/odczyt JSON, brakujący plik, niepoprawny JSON, brakujące pole  |       6       |
+| **Razem**              |                                                                      |    **33**     |

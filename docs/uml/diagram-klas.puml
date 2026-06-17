@@ -18,23 +18,26 @@ abstract class Account {
     - __balance: float
     - __transactions: list[Transaction]
     + {static} is_valid_amount(amount: float): bool
-    + deposit(amount: float): bool
-    + withdraw(amount: float): bool
+    + deposit(amount: float): void
+    + withdraw(amount: float): void
     + get_balance(): float
     + get_transactions(): list[Transaction]
     # _change_balance(amount: float): void
+    # _record_transaction(type: TransactionType, amount: float): void
     + {abstract} apply_monthly_update(): void
 }
 
 class SavingsAccount {
     + apply_monthly_update(): void
+    + to_dict(): dict
 }
 
 class CheckingAccount {
     - __overdraft_limit: float
     + get_overdraft_limit(): float
-    + withdraw(amount: float): bool
+    + withdraw(amount: float): void
     + apply_monthly_update(): void
+    + to_dict(): dict
 }
 
 class Customer {
@@ -43,19 +46,24 @@ class Customer {
     - __accounts: list[Account]
     + add_account(account: Account): void
     + get_account(index: int): Account
+    + get_accounts(): list[Account]
     + get_number_of_accounts(): int
     + get_first_name(): str
     + get_last_name(): str
+    + to_dict(): dict
 }
 
 class Bank {
     - __customers: list[Customer]
     + add_customer(customer: Customer): void
     + get_customer(index: int): Customer
+    + get_customers(): list[Customer]
     + get_number_of_customers(): int
-    + transfer(source: Account, target: Account, amount: float): bool
+    + transfer(source: Account, target: Account, amount: float): void
     + get_total_balance(): float
     + generate_report(): dict
+    + save_to_file(filepath: str): void
+    + load_from_file(filepath: str): void
 }
 
 SavingsAccount --|> Account
