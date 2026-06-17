@@ -1,11 +1,11 @@
 # Banking OOP Python
 
-Projekt zaliczeniowy z programowania obiektowego w Pythonie. Mini-system bankowy pokazujący kluczowe elementy OOP: dziedziczenie, enkapsulację, polimorfizm, kompozycję, agregację i kontrakty. Uzupełniony o zapis/odczyt stanu do pliku JSON, obsługę wyjątków i graficzny interfejs użytkownika (tkinter).
+Projekt zaliczeniowy z programowania obiektowego. Napisany w całości w Pythonie. Mini system bankowy pokazujący najważniejsze elementy OOP: dziedziczenie, enkapsulację, polimorfizm, kompozycję, agregację i kontrakty. Uzupełniony o zapis/odczyt stanu do pliku JSON, obsługę wyjątków i graficzny interfejs użytkownika (tkinter).
 
 ## Wymagania
 
 - Python 3.10 lub nowszy
-- Brak zewnętrznych zależności — projekt korzysta wyłącznie z biblioteki standardowej Pythona (`tkinter`, `json`, `abc`, `enum`, `unittest`)
+- Brak zewnętrznych zależności — projekt korzysta wyłącznie z biblioteki standardowej Pythona (tkinter, json, abc, enum, unittest)
 
 ## Jak uruchomić
 
@@ -22,7 +22,7 @@ cd banking-oop-python
 pip install -e .
 ```
 
-To polecenie rejestruje pakiet `banking` w środowisku Pythona. Wymagane tylko raz — po każdej zmianie kodu nie trzeba tego powtarzać.
+To polecenie rejestruje pakiet banking w środowisku Pythona. Wymagane tylko raz.
 
 ### 3. Uruchom aplikację
 
