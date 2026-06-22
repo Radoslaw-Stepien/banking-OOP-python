@@ -1,7 +1,9 @@
 import os
 import unittest
 
-from banking import Account, Customer, SavingsAccount, CheckingAccount, Bank, TransactionType
+from banking import (
+    Account, Customer, SavingsAccount, CheckingAccount, Bank, TransactionType
+)
 
 
 class AccountTests(unittest.TestCase):
@@ -45,13 +47,15 @@ class CheckingAccountTests(unittest.TestCase):
         self.assertEqual(account.get_balance(), 100.0)
         self.assertEqual(account.get_overdraft_limit(), 50.0)
 
-    def test_checking_account_allow_withdraw_within_overdraft_limit(self) -> None:
-        """Wyplata w granicach salda + limitu jest dozwolona — saldo moze byc ujemne."""
+    def test_checking_account_allow_withdraw_within_overdraft_limit(
+            self) -> None:
+        """Wyplata w granicach salda + limitu jest dozwolona."""
         account = CheckingAccount(100.0, 50.0)
         account.withdraw(120.0)
         self.assertEqual(account.get_balance(), -20.0)
 
-    def test_checking_account_rejects_withdraw_above_overdraft_limit(self) -> None:
+    def test_checking_account_rejects_withdraw_above_overdraft_limit(
+            self) -> None:
         """Wyplata powyzej salda + limitu rzuca ValueError."""
         account = CheckingAccount(100.0, 50.0)
         with self.assertRaises(ValueError):
@@ -83,7 +87,9 @@ class CheckingAccountTests(unittest.TestCase):
         account.withdraw(40.0)
         transactions = account.get_transactions()
         self.assertEqual(len(transactions), 1)
-        self.assertEqual(transactions[0].get_type(), TransactionType.WITHDRAWAL)
+        self.assertEqual(
+            transactions[0].get_type(),
+            TransactionType.WITHDRAWAL)
         self.assertEqual(transactions[0].get_amount(), 40.0)
 
 
@@ -115,6 +121,20 @@ class CustomerTests(unittest.TestCase):
         self.assertIn(first, accounts)
         self.assertIn(second, accounts)
 
+    def test_customer_get_account_out_of_range_raises_error(self) -> None:
+        """get_account z indeksem poza zakresem rzuca IndexError."""
+        customer = Customer("Jane", "Simms")
+        customer.add_account(SavingsAccount(100.0))
+        with self.assertRaises(IndexError):
+            customer.get_account(1)
+
+    def test_customer_rejects_empty_name(self) -> None:
+        """Pusty ciag jako imie lub nazwisko rzuca ValueError."""
+        with self.assertRaises(ValueError):
+            Customer("", "Kowalski")
+        with self.assertRaises(ValueError):
+            Customer("Jan", "")
+
 
 class BankTests(unittest.TestCase):
     def test_bank_counts_customers(self) -> None:
@@ -124,12 +144,18 @@ class BankTests(unittest.TestCase):
         self.assertEqual(bank.get_number_of_customers(), 1)
 
     def test_bank_returns_customer_by_index(self) -> None:
-        """Bank zwraca klienta po indeksie; None dla indeksu poza zakresem."""
+        """Bank zwraca klienta po indeksie."""
         bank = Bank()
         customer = Customer("Jan", "Kowalski")
         bank.add_customer(customer)
         self.assertIs(bank.get_customer(0), customer)
-        self.assertIsNone(bank.get_customer(1))
+
+    def test_bank_get_customer_out_of_range_raises_error(self) -> None:
+        """get_customer z indeksem poza zakresem rzuca IndexError."""
+        bank = Bank()
+        bank.add_customer(Customer("Jan", "Kowalski"))
+        with self.assertRaises(IndexError):
+            bank.get_customer(1)
 
     def test_get_customers_returns_all(self) -> None:
         """get_customers zwraca liste wszystkich klientow."""
@@ -153,7 +179,7 @@ class BankTests(unittest.TestCase):
         self.assertEqual(target.get_balance(), 80.0)
 
     def test_transfer_fails_when_source_has_insufficient_funds(self) -> None:
-        """Przelew rzuca ValueError gdy zrodlo nie ma wystarczajacych srodkow."""
+        """Przelew rzuca ValueError gdy brak wystarczajacych srodkow."""
         bank = Bank()
         source = SavingsAccount(20.0)
         target = SavingsAccount(50.0)
@@ -172,7 +198,7 @@ class BankTests(unittest.TestCase):
         self.assertEqual(bank.get_total_balance(), 150.0)
 
     def test_generate_report_returns_balance_per_customer(self):
-        """Raport zawiera laczne saldo per klient jako slownik nazwisko -> kwota."""
+        """Raport zawiera laczne saldo per klient jako slownik."""
         bank = Bank()
         customer = Customer("Jan", "Kowalski")
         customer.add_account(SavingsAccount(200.0))
@@ -193,12 +219,14 @@ class TransactionTests(unittest.TestCase):
         self.assertEqual(transactions[0].get_amount(), 50.0)
 
     def test_withdrawal_creates_transaction(self):
-        """Wyplata tworzy rekord transakcji typu WITHDRAWAL z prawidlowa kwota."""
+        """Wyplata tworzy rekord transakcji WITHDRAWAL z prawidlowa kwota."""
         account = SavingsAccount(100.0)
         account.withdraw(30.0)
         transactions = account.get_transactions()
         self.assertEqual(len(transactions), 1)
-        self.assertEqual(transactions[0].get_type(), TransactionType.WITHDRAWAL)
+        self.assertEqual(
+            transactions[0].get_type(),
+            TransactionType.WITHDRAWAL)
         self.assertEqual(transactions[0].get_amount(), 30.0)
 
 
@@ -285,6 +313,27 @@ class FileIOTests(unittest.TestCase):
             f.write('{"customers": [{"first_name": "Jan"}]}')
         with self.assertRaises(ValueError):
             self.bank.load_from_file(self.FILEPATH)
+
+    def test_save_and_load_restores_transaction_history(self):
+        """Zapis i odczyt przywracaja pelna historie transakcji."""
+        customer = self.bank.get_customer(0)
+        account = customer.get_account(0)
+        account.deposit(200.0)
+        account.withdraw(50.0)
+
+        self.bank.save_to_file(self.FILEPATH)
+        new_bank = Bank()
+        new_bank.load_from_file(self.FILEPATH)
+
+        restored = new_bank.get_customer(0).get_account(0)
+        transactions = restored.get_transactions()
+        self.assertEqual(len(transactions), 2)
+        self.assertEqual(transactions[0].get_type(), TransactionType.DEPOSIT)
+        self.assertEqual(transactions[0].get_amount(), 200.0)
+        self.assertEqual(
+            transactions[1].get_type(), TransactionType.WITHDRAWAL
+        )
+        self.assertEqual(transactions[1].get_amount(), 50.0)
 
 
 if __name__ == "__main__":

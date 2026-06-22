@@ -4,9 +4,11 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import json
 
+
 class TransactionType(Enum):
     DEPOSIT = "deposit"
     WITHDRAWAL = "withdrawal"
+
 
 class Transaction:
     def __init__(self, transaction_type: TransactionType, amount: float):
@@ -18,6 +20,10 @@ class Transaction:
 
     def get_amount(self) -> float:
         return self.__amount
+
+    def to_dict(self) -> dict:
+        return {"type": self.__type.value, "amount": self.__amount}
+
 
 class Account(ABC):
     """Klasa reprezentujaca konto bankowe."""
@@ -36,7 +42,10 @@ class Account(ABC):
         if not Account.is_valid_amount(amount):
             raise ValueError("Kwota wplaty musi byc wieksza od zera")
         self.__balance += amount
-        self.__transactions.append(Transaction(TransactionType.DEPOSIT, amount))
+        self.__transactions.append(
+            Transaction(
+                TransactionType.DEPOSIT,
+                amount))
 
     def withdraw(self, amount: float) -> None:
         if not Account.is_valid_amount(amount):
@@ -44,7 +53,10 @@ class Account(ABC):
         if amount > self.__balance:
             raise ValueError("Niewystarczajace saldo na koncie")
         self.__balance -= amount
-        self.__transactions.append(Transaction(TransactionType.WITHDRAWAL, amount))
+        self.__transactions.append(
+            Transaction(
+                TransactionType.WITHDRAWAL,
+                amount))
 
     def get_balance(self) -> float:
         return self.__balance
@@ -55,7 +67,8 @@ class Account(ABC):
     def _change_balance(self, amount: float) -> None:
         self.__balance += amount
 
-    def _record_transaction(self, transaction_type: TransactionType, amount: float) -> None:
+    def _record_transaction(
+            self, transaction_type: TransactionType, amount: float) -> None:
         self.__transactions.append(Transaction(transaction_type, amount))
 
     def __str__(self) -> str:
@@ -64,6 +77,7 @@ class Account(ABC):
     @abstractmethod
     def apply_monthly_update(self) -> None:
         pass
+
 
 class SavingsAccount(Account):
     """Konto oszczednosciowe."""
@@ -75,10 +89,16 @@ class SavingsAccount(Account):
         self._change_balance(self.get_balance() * 0.05 / 12)
 
     def to_dict(self) -> dict:
-        return {"type": "savings", "balance": self.get_balance()}
+        return {
+            "type": "savings",
+            "balance": self.get_balance(),
+            "transactions": [t.to_dict() for t in self.get_transactions()],
+        }
+
 
 class CheckingAccount(Account):
     """Konto biezace."""
+
     def __init__(self, balance: float = 0.0, overdraft_limit: float = 0.0):
 
         if overdraft_limit < 0:
@@ -101,22 +121,32 @@ class CheckingAccount(Account):
         self._change_balance(-5.0)
 
     def to_dict(self) -> dict:
-        return {"type": "checking", "balance": self.get_balance(), "overdraft_limit": self.__overdraft_limit}
+        return {
+            "type": "checking",
+            "balance": self.get_balance(),
+            "overdraft_limit": self.__overdraft_limit,
+            "transactions": [t.to_dict() for t in self.get_transactions()],
+        }
+
 
 class Customer:
     """Klasa reprezentujaca klienta banku."""
 
     def __init__(self, first_name: str, last_name: str):
-        self.__first_name = first_name
-        self.__last_name = last_name
+        if not first_name or not first_name.strip():
+            raise ValueError("Imie klienta nie moze byc puste")
+        if not last_name or not last_name.strip():
+            raise ValueError("Nazwisko klienta nie moze byc puste")
+        self.__first_name = first_name.strip()
+        self.__last_name = last_name.strip()
         self.__accounts: list[Account] = []
 
     def add_account(self, account: Account) -> None:
         self.__accounts.append(account)
 
-    def get_account(self, index: int) -> Account | None:
+    def get_account(self, index: int) -> Account:
         if index < 0 or index >= len(self.__accounts):
-            return None
+            raise IndexError(f"Brak konta o indeksie {index}")
         return self.__accounts[index]
 
     def get_accounts(self) -> list[Account]:
@@ -135,7 +165,7 @@ class Customer:
         return {
             "first_name": self.__first_name,
             "last_name": self.__last_name,
-            "accounts": [self.__accounts[i].to_dict() for i in range(len(self.__accounts))]
+            "accounts": [a.to_dict() for a in self.__accounts]
         }
 
     def __str__(self) -> str:
@@ -144,6 +174,7 @@ class Customer:
             f"lastName='{self.__last_name}', "
             f"number_of_accounts={self.get_number_of_accounts()}}}"
         )
+
 
 class Bank:
     """Klasa reprezentujaca bank."""
@@ -160,15 +191,20 @@ class Bank:
     def get_number_of_customers(self) -> int:
         return len(self.__customers)
 
-    def get_customer(self, index: int) -> Customer | None:
+    def get_customer(self, index: int) -> Customer:
         if index < 0 or index >= len(self.__customers):
-            return None
+            raise IndexError(f"Brak klienta o indeksie {index}")
         return self.__customers[index]
 
-    def transfer(self, source: Account, target: Account, amount: float) -> None:
+    def transfer(self, source: Account, target: Account,
+                 amount: float) -> None:
         source.withdraw(amount)
-        target.deposit(amount)
-    
+        try:
+            target.deposit(amount)
+        except ValueError:
+            source.deposit(amount)
+            raise
+
     def get_total_balance(self) -> float:
         total = 0.0
         for customer in self.__customers:
@@ -201,22 +237,35 @@ class Bank:
         except FileNotFoundError:
             raise FileNotFoundError(f"Plik '{filepath}' nie istnieje.")
         except json.JSONDecodeError as e:
-            raise ValueError(f"Plik '{filepath}' zawiera nieprawidlowy JSON: {e}") from e
+            raise ValueError(
+                f"Plik '{filepath}' zawiera nieprawidlowy JSON: {e}") from e
         except IOError as e:
             raise IOError(f"Nie mozna odczytac pliku '{filepath}': {e}") from e
 
         try:
             self.__customers = []
             for customer_data in data["customers"]:
-                customer = Customer(customer_data["first_name"], customer_data["last_name"])
+                customer = Customer(
+                    customer_data["first_name"],
+                    customer_data["last_name"])
                 for account_data in customer_data["accounts"]:
                     if account_data["type"] == "savings":
                         account = SavingsAccount(account_data["balance"])
                     elif account_data["type"] == "checking":
-                        account = CheckingAccount(account_data["balance"], account_data["overdraft_limit"])
+                        account = CheckingAccount(
+                            account_data["balance"],
+                            account_data["overdraft_limit"]
+                        )
                     else:
-                        raise ValueError(f"Nieznany typ konta: {account_data['type']}")
+                        raise ValueError(
+                            f"Nieznany typ konta: {account_data['type']}"
+                        )
+                    for tx in account_data.get("transactions", []):
+                        account._record_transaction(
+                            TransactionType(tx["type"]), tx["amount"]
+                        )
                     customer.add_account(account)
                 self.__customers.append(customer)
         except KeyError as e:
-            raise ValueError(f"Nieprawidlowa struktura pliku — brakuje pola: {e}") from e
+            raise ValueError(
+                f"Nieprawidlowa struktura pliku — brakuje pola: {e}") from e

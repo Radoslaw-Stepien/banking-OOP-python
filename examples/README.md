@@ -1,3 +1,3 @@
 # Examples
 
-Tutaj trafiaja male, wydzielone przyklady dla tematow takich jak singleton albo wielodziedziczenie, jesli nie beda naturalna czescia rdzenia projektu bankowego.
+Tutaj trafiają małe, wydzielone przykłady dla tematów takich jak singleton albo wielodziedziczenie.

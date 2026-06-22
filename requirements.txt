@@ -1,6 +1,7 @@
-# Projekt nie ma zewnętrznych zależności.
+# Projekt nie ma zewnętrznych zależności PyPI.
 # Korzysta wyłącznie z biblioteki standardowej Pythona:
-#   - tkinter  (GUI)
+#   - tkinter  (GUI) — wbudowany w instalator python.org; na Homebrew/macOS wymaga
+#                      "brew install python-tk@3.XX"; na Ubuntu/Debian: "sudo apt install python3-tk"
 #   - json     (zapis/odczyt pliku)
 #   - abc      (klasy abstrakcyjne)
 #   - enum     (TransactionType)

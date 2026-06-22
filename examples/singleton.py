@@ -7,6 +7,7 @@ class BankConfig:
             cls._instance.interest_rate = 0.05
         return cls._instance
 
+
 if __name__ == "__main__":
     config1 = BankConfig()
     config2 = BankConfig()

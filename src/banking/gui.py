@@ -3,7 +3,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 
-from .domain import Bank, Customer, SavingsAccount, CheckingAccount, Account, TransactionType
+from .domain import (
+    Bank, Customer, SavingsAccount, CheckingAccount, Account, TransactionType
+)
 
 
 class BankApp(tk.Tk):
@@ -34,11 +36,41 @@ class BankApp(tk.Tk):
         bar = ttk.Frame(self, relief="raised")
         bar.pack(side="top", fill="x", padx=2, pady=2)
 
-        ttk.Button(bar, text="Zapisz stan", command=self._save_state).pack(side="left", padx=4, pady=3)
-        ttk.Button(bar, text="Wczytaj stan", command=self._load_state).pack(side="left", padx=4, pady=3)
-        ttk.Separator(bar, orient="vertical").pack(side="left", fill="y", padx=6, pady=3)
-        ttk.Button(bar, text="+ Nowy klient", command=self._dialog_add_customer).pack(side="left", padx=4, pady=3)
-        ttk.Button(bar, text="+ Nowe konto", command=self._dialog_add_account).pack(side="left", padx=4, pady=3)
+        ttk.Button(
+            bar,
+            text="Zapisz stan",
+            command=self._save_state).pack(
+            side="left",
+            padx=4,
+            pady=3)
+        ttk.Button(
+            bar,
+            text="Wczytaj stan",
+            command=self._load_state).pack(
+            side="left",
+            padx=4,
+            pady=3)
+        ttk.Separator(
+            bar,
+            orient="vertical").pack(
+            side="left",
+            fill="y",
+            padx=6,
+            pady=3)
+        ttk.Button(
+            bar,
+            text="+ Nowy klient",
+            command=self._dialog_add_customer).pack(
+            side="left",
+            padx=4,
+            pady=3)
+        ttk.Button(
+            bar,
+            text="+ Nowe konto",
+            command=self._dialog_add_account).pack(
+            side="left",
+            padx=4,
+            pady=3)
 
     def _build_main_area(self) -> None:
         paned = ttk.PanedWindow(self, orient="horizontal")
@@ -51,7 +83,12 @@ class BankApp(tk.Tk):
         frame = ttk.LabelFrame(paned, text="Klienci i konta")
         paned.add(frame, weight=1)
 
-        self._tree = ttk.Treeview(frame, columns=("balance", "type"), show="tree headings")
+        self._tree = ttk.Treeview(
+            frame,
+            columns=(
+                "balance",
+                "type"),
+            show="tree headings")
         self._tree.heading("#0", text="Nazwa")
         self._tree.heading("balance", text="Saldo (zl)")
         self._tree.heading("type", text="Typ")
@@ -74,44 +111,113 @@ class BankApp(tk.Tk):
         nb.pack(fill="both", expand=True)
 
         nb.add(self._build_tab_operations(nb), text="Wplata / Wyplata")
-        nb.add(self._build_tab_transfer(nb),   text="Przelew")
-        nb.add(self._build_tab_history(nb),    text="Historia transakcji")
+        nb.add(self._build_tab_transfer(nb), text="Przelew")
+        nb.add(self._build_tab_history(nb), text="Historia transakcji")
 
     def _build_tab_operations(self, parent) -> ttk.Frame:
         tab = ttk.Frame(parent, padding=12)
 
-        ttk.Label(tab, text="Wybrane konto:").grid(row=0, column=0, sticky="w", pady=6)
-        self._lbl_selected = ttk.Label(tab, text="— wybierz konto z listy po lewej", foreground="gray")
+        ttk.Label(
+            tab,
+            text="Wybrane konto:").grid(
+            row=0,
+            column=0,
+            sticky="w",
+            pady=6)
+        self._lbl_selected = ttk.Label(
+            tab, text="— wybierz konto z listy po lewej", foreground="gray")
         self._lbl_selected.grid(row=0, column=1, sticky="w", pady=6)
 
-        ttk.Label(tab, text="Kwota (zl):").grid(row=1, column=0, sticky="w", pady=6)
+        ttk.Label(
+            tab,
+            text="Kwota (zl):").grid(
+            row=1,
+            column=0,
+            sticky="w",
+            pady=6)
         self._var_amount = tk.StringVar()
-        ttk.Entry(tab, textvariable=self._var_amount, width=16).grid(row=1, column=1, sticky="w", pady=6)
+        ttk.Entry(
+            tab,
+            textvariable=self._var_amount,
+            width=16).grid(
+            row=1,
+            column=1,
+            sticky="w",
+            pady=6)
 
         btn_frame = ttk.Frame(tab)
         btn_frame.grid(row=2, column=0, columnspan=2, pady=12)
-        ttk.Button(btn_frame, text="Wplac",  width=14, command=self._deposit).pack(side="left", padx=6)
-        ttk.Button(btn_frame, text="Wyplac", width=14, command=self._withdraw).pack(side="left", padx=6)
+        ttk.Button(
+            btn_frame,
+            text="Wplac",
+            width=14,
+            command=self._deposit).pack(
+            side="left",
+            padx=6)
+        ttk.Button(
+            btn_frame,
+            text="Wyplac",
+            width=14,
+            command=self._withdraw).pack(
+            side="left",
+            padx=6)
 
         return tab
 
     def _build_tab_transfer(self, parent) -> ttk.Frame:
         tab = ttk.Frame(parent, padding=12)
 
-        ttk.Label(tab, text="Z konta:").grid(row=0, column=0, sticky="w", pady=6)
-        self._lbl_transfer_from = ttk.Label(tab, text="— wybierz konto z listy po lewej", foreground="gray")
+        ttk.Label(
+            tab,
+            text="Z konta:").grid(
+            row=0,
+            column=0,
+            sticky="w",
+            pady=6)
+        self._lbl_transfer_from = ttk.Label(
+            tab, text="— wybierz konto z listy po lewej", foreground="gray")
         self._lbl_transfer_from.grid(row=0, column=1, sticky="w", pady=6)
 
-        ttk.Label(tab, text="Na konto:").grid(row=1, column=0, sticky="w", pady=6)
+        ttk.Label(
+            tab,
+            text="Na konto:").grid(
+            row=1,
+            column=0,
+            sticky="w",
+            pady=6)
         self._var_transfer_target = tk.StringVar()
-        self._combo_target = ttk.Combobox(tab, textvariable=self._var_transfer_target, width=34, state="readonly")
+        self._combo_target = ttk.Combobox(
+            tab,
+            textvariable=self._var_transfer_target,
+            width=34,
+            state="readonly")
         self._combo_target.grid(row=1, column=1, sticky="w", pady=6)
 
-        ttk.Label(tab, text="Kwota (zl):").grid(row=2, column=0, sticky="w", pady=6)
+        ttk.Label(
+            tab,
+            text="Kwota (zl):").grid(
+            row=2,
+            column=0,
+            sticky="w",
+            pady=6)
         self._var_transfer_amount = tk.StringVar()
-        ttk.Entry(tab, textvariable=self._var_transfer_amount, width=16).grid(row=2, column=1, sticky="w", pady=6)
+        ttk.Entry(
+            tab,
+            textvariable=self._var_transfer_amount,
+            width=16).grid(
+            row=2,
+            column=1,
+            sticky="w",
+            pady=6)
 
-        ttk.Button(tab, text="Wykonaj przelew", command=self._transfer).grid(row=3, column=0, columnspan=2, pady=12)
+        ttk.Button(
+            tab,
+            text="Wykonaj przelew",
+            command=self._transfer).grid(
+            row=3,
+            column=0,
+            columnspan=2,
+            pady=12)
 
         return tab
 
@@ -119,7 +225,10 @@ class BankApp(tk.Tk):
         tab = ttk.Frame(parent, padding=12)
 
         self._history_box = tk.Listbox(tab, font=("Courier", 10), height=16)
-        vsb = ttk.Scrollbar(tab, orient="vertical", command=self._history_box.yview)
+        vsb = ttk.Scrollbar(
+            tab,
+            orient="vertical",
+            command=self._history_box.yview)
         self._history_box.configure(yscrollcommand=vsb.set)
         self._history_box.pack(side="left", fill="both", expand=True)
         vsb.pack(side="right", fill="y")
@@ -128,9 +237,10 @@ class BankApp(tk.Tk):
 
     def _build_status_bar(self) -> None:
         self._var_status = tk.StringVar(value="Gotowy.")
-        ttk.Label(self, textvariable=self._var_status, relief="sunken", anchor="w").pack(
-            side="bottom", fill="x", padx=2, pady=1
+        lbl = ttk.Label(
+            self, textvariable=self._var_status, relief="sunken", anchor="w"
         )
+        lbl.pack(side="bottom", fill="x", padx=2, pady=1)
 
     # ------------------------------------------------------------------ #
     # Dane demonstracyjne                                                  #
@@ -159,9 +269,11 @@ class BankApp(tk.Tk):
                                      values=("", "Klient"), open=True)
             for ai, account in enumerate(customer.get_accounts()):
                 atype = self._account_type_label(account)
-                self._tree.insert(node, "end", iid=f"c{ci}a{ai}",
-                                  text=f"Konto {ai + 1}",
-                                  values=(f"{account.get_balance():.2f}", atype))
+                self._tree.insert(
+                    node, "end", iid=f"c{ci}a{ai}",
+                    text=f"Konto {ai + 1}",
+                    values=(f"{account.get_balance():.2f}", atype)
+                )
         self._refresh_transfer_targets()
 
     def _refresh_transfer_targets(self) -> None:
@@ -185,8 +297,10 @@ class BankApp(tk.Tk):
             self._history_box.insert(tk.END, "Brak transakcji dla tego konta.")
             return
         for t in transactions:
-            prefix = "WPLATA  +" if t.get_type() == TransactionType.DEPOSIT else "WYPLATA -"
-            self._history_box.insert(tk.END, f"  {prefix}  {t.get_amount():.2f} zl")
+            is_dep = t.get_type() == TransactionType.DEPOSIT
+            prefix = "WPLATA  +" if is_dep else "WYPLATA -"
+            self._history_box.insert(
+                tk.END, f"  {prefix}  {t.get_amount():.2f} zl")
 
     def _update_account_label(self) -> None:
         if self._selected_account and self._selected_customer:
@@ -196,12 +310,15 @@ class BankApp(tk.Tk):
 
     def _describe_selected(self) -> str:
         atype = self._account_type_label(self._selected_account)
-        name = f"{self._selected_customer.get_first_name()} {self._selected_customer.get_last_name()}"
-        return f"{name} — {atype}  ({self._selected_account.get_balance():.2f} zl)"
+        first = self._selected_customer.get_first_name()
+        last = self._selected_customer.get_last_name()
+        balance = self._selected_account.get_balance()
+        return f"{first} {last} — {atype}  ({balance:.2f} zl)"
 
     @staticmethod
     def _account_type_label(account: Account) -> str:
-        return "Oszczednosciowe" if isinstance(account, SavingsAccount) else "Biezace"
+        return "Oszczednosciowe" if isinstance(
+            account, SavingsAccount) else "Biezace"
 
     # ------------------------------------------------------------------ #
     # Zdarzenie: wybor w drzewie                                           #
@@ -215,8 +332,11 @@ class BankApp(tk.Tk):
         if "a" not in iid:
             self._selected_customer = None
             self._selected_account = None
-            self._lbl_selected.config(text="— wybierz konto z listy po lewej", foreground="gray")
-            self._lbl_transfer_from.config(text="— wybierz konto z listy po lewej", foreground="gray")
+            self._lbl_selected.config(
+                text="— wybierz konto z listy po lewej",
+                foreground="gray")
+            self._lbl_transfer_from.config(
+                text="— wybierz konto z listy po lewej", foreground="gray")
             return
 
         ci, ai = self._parse_iid(iid)
@@ -238,7 +358,8 @@ class BankApp(tk.Tk):
 
     def _require_account(self) -> bool:
         if self._selected_account is None:
-            messagebox.showwarning("Brak wyboru", "Najpierw wybierz konto z listy po lewej.")
+            messagebox.showwarning("Brak wyboru",
+                                   "Najpierw wybierz konto z listy po lewej.")
             return False
         return True
 
@@ -246,7 +367,9 @@ class BankApp(tk.Tk):
         try:
             return float(var.get().replace(",", "."))
         except ValueError:
-            messagebox.showerror("Niepoprawna kwota", "Podaj liczbe, np. 100 lub 50.50")
+            messagebox.showerror(
+                "Niepoprawna kwota",
+                "Podaj liczbe, np. 100 lub 50.50")
             return None
 
     def _deposit(self) -> None:
@@ -262,7 +385,9 @@ class BankApp(tk.Tk):
             self._refresh_history()
             self._update_account_label()
             self._var_status.set(
-                f"Wplacono {amount:.2f} zl.  Nowe saldo: {self._selected_account.get_balance():.2f} zl"
+                f"Wplacono {
+                    amount:.2f} zl.  Nowe saldo: {
+                    self._selected_account.get_balance():.2f} zl"
             )
         except ValueError as e:
             messagebox.showerror("Blad wplaty", str(e))
@@ -280,7 +405,9 @@ class BankApp(tk.Tk):
             self._refresh_history()
             self._update_account_label()
             self._var_status.set(
-                f"Wyplacono {amount:.2f} zl.  Nowe saldo: {self._selected_account.get_balance():.2f} zl"
+                f"Wyplacono {
+                    amount:.2f} zl.  Nowe saldo: {
+                    self._selected_account.get_balance():.2f} zl"
             )
         except ValueError as e:
             messagebox.showerror("Blad wyplaty", str(e))
@@ -290,7 +417,8 @@ class BankApp(tk.Tk):
             return
         idx = self._combo_target.current()
         if idx < 0:
-            messagebox.showwarning("Brak wyboru", "Wybierz konto docelowe z listy.")
+            messagebox.showwarning(
+                "Brak wyboru", "Wybierz konto docelowe z listy.")
             return
         amount = self._parse_amount(self._var_transfer_amount)
         if amount is None:
@@ -300,7 +428,8 @@ class BankApp(tk.Tk):
         target = self._bank.get_customer(ci).get_account(ai)
 
         if target is self._selected_account:
-            messagebox.showwarning("Blad", "Konto zrodlowe i docelowe musza byc rozne.")
+            messagebox.showwarning(
+                "Blad", "Konto zrodlowe i docelowe musza byc rozne.")
             return
         try:
             self._bank.transfer(self._selected_account, target, amount)
@@ -326,19 +455,25 @@ class BankApp(tk.Tk):
         try:
             self._bank.add_customer(Customer(first.strip(), last.strip()))
             self._refresh_tree()
-            self._var_status.set(f"Dodano klienta: {first.strip()} {last.strip()}")
+            self._var_status.set(
+                f"Dodano klienta: {
+                    first.strip()} {
+                    last.strip()}")
         except ValueError as e:
             messagebox.showerror("Blad", str(e))
 
     def _dialog_add_account(self) -> None:
         sel = self._tree.selection()
         if not sel:
-            messagebox.showwarning("Brak wyboru", "Wybierz klienta z listy, dla ktorego chcesz dodac konto.")
+            messagebox.showwarning(
+                "Brak wyboru",
+                "Wybierz klienta z listy, dla ktorego chcesz dodac konto.")
             return
         iid = sel[0]
         ci = self._parse_iid(iid)[0] if "a" in iid else int(iid[1:])
-        customer = self._bank.get_customer(ci)
-        if customer is None:
+        try:
+            customer = self._bank.get_customer(ci)
+        except IndexError:
             return
 
         atype = simpledialog.askstring(
@@ -349,7 +484,10 @@ class BankApp(tk.Tk):
         if atype not in ("1", "2"):
             return
 
-        bal_str = simpledialog.askstring("Saldo poczatkowe", "Saldo poczatkowe (zl):", parent=self)
+        bal_str = simpledialog.askstring(
+            "Saldo poczatkowe",
+            "Saldo poczatkowe (zl):",
+            parent=self)
         try:
             balance = float(bal_str.replace(",", "."))
         except (ValueError, AttributeError):
@@ -360,7 +498,8 @@ class BankApp(tk.Tk):
             if atype == "1":
                 account: Account = SavingsAccount(balance)
             else:
-                ov_str = simpledialog.askstring("Limit debetowy", "Limit debetowy (zl):", parent=self)
+                ov_str = simpledialog.askstring(
+                    "Limit debetowy", "Limit debetowy (zl):", parent=self)
                 try:
                     overdraft = float(ov_str.replace(",", "."))
                 except (ValueError, AttributeError):
@@ -405,8 +544,11 @@ class BankApp(tk.Tk):
             self._bank.load_from_file(filepath)
             self._selected_customer = None
             self._selected_account = None
-            self._lbl_selected.config(text="— wybierz konto z listy po lewej", foreground="gray")
-            self._lbl_transfer_from.config(text="— wybierz konto z listy po lewej", foreground="gray")
+            self._lbl_selected.config(
+                text="— wybierz konto z listy po lewej",
+                foreground="gray")
+            self._lbl_transfer_from.config(
+                text="— wybierz konto z listy po lewej", foreground="gray")
             self._history_box.delete(0, tk.END)
             self._refresh_tree()
             self._var_status.set(f"Stan wczytany: {filepath}")

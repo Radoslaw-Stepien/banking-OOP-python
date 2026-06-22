@@ -4,41 +4,49 @@ Projekt zaliczeniowy z programowania obiektowego. Napisany w całości w Pythoni
 
 ## Wymagania
 
-- Python 3.10 lub nowszy
-- Brak zewnętrznych zależności — projekt korzysta wyłącznie z biblioteki standardowej Pythona (tkinter, json, abc, enum, unittest)
+- Python 3.10 lub nowszy — **zalecana instalacja z [python.org](https://www.python.org/downloads/)**, która zawiera `tkinter` domyślnie
+- Brak zewnętrznych zależności PyPI — projekt korzysta wyłącznie z biblioteki standardowej Pythona (json, abc, enum, unittest)
+
+> **Uwaga dotycząca `tkinter`:** Moduł GUI jest oparty na `tkinter`, który wchodzi w skład oficjalnego instalatora z python.org (Windows i macOS). W przypadku innych dystrybucji może wymagać doinstalowania:
+> - **macOS z Homebrew:** `brew install python-tk@3.XX` (zastąp `XX` wersją Pythona, np. `3.13`)
+> - **Linux (Ubuntu/Debian):** `sudo apt install python3-tk`
 
 ## Jak uruchomić
 
 ### 1. Sklonuj repozytorium
 
 ```bash
-git clone <url-repozytorium>
+git clone https://github.com/Radoslaw-Stepien/banking-OOP-python
 cd banking-oop-python
 ```
 
-### 2. Zainstaluj pakiet (jednorazowo)
+### 2. Uruchom aplikację
 
+macOS / Linux:
 ```bash
-pip install -e .
+PYTHONPATH=src python3 -m banking
 ```
 
-To polecenie rejestruje pakiet banking w środowisku Pythona. Wymagane tylko raz.
-
-### 3. Uruchom aplikację
-
-```bash
-python -m banking
+Windows (cmd):
+```cmd
+set PYTHONPATH=src && python -m banking
 ```
 
 Otworzy się okno graficzne z załadowanymi danymi demonstracyjnymi (dwóch klientów, trzy konta).
 
-### 4. Uruchom testy
+### 3. Uruchom testy
 
+macOS / Linux:
 ```bash
-python -m unittest discover -s tests -v
+PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-Oczekiwany wynik: **33 testy, wszystkie przechodzą (OK)**.
+Windows (cmd):
+```cmd
+set PYTHONPATH=src && python -m unittest discover -s tests -v
+```
+
+Oczekiwany wynik: **37 testów, wszystkie przechodzą (OK)**.
 
 ## Struktura repozytorium
 
@@ -50,7 +58,7 @@ banking-oop-python/
 │   ├── __init__.py     # publiczny interfejs pakietu
 │   └── __main__.py     # entry point — uruchamia GUI
 ├── tests/
-│   └── test_banking.py # testy jednostkowe (33 testy)
+│   └── test_banking.py # testy jednostkowe (37 testów)
 ├── docs/
 │   ├── uml/            # diagram klas PlantUML
 │   ├── decyzje-architektoniczne.md
@@ -98,8 +106,14 @@ banking-oop-python/
 
 ## Testy
 
+macOS / Linux:
 ```bash
-python -m unittest discover -s tests -v
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+```
+
+Windows (cmd):
+```cmd
+set PYTHONPATH=src && python -m unittest discover -s tests -v
 ```
 
 | Klasa testów           | Co weryfikuje                                                        | Liczba testów |
@@ -107,10 +121,10 @@ python -m unittest discover -s tests -v
 | `AccountTests`         | wpłata i wypłata — `ValueError` przy błędnych danych                 |       3       |
 | `SavingsAccountTests`  | saldo początkowe, walidacja przy tworzeniu                           |       2       |
 | `CheckingAccountTests` | limit debetowy, wypłata w granicach limitu, historia transakcji      |       7       |
-| `CustomerTests`        | przechowywanie kont, dostęp po indeksie, `get_accounts()`            |       2       |
-| `BankTests`            | liczenie klientów, `get_customers()`, przelew, raport sald           |       6       |
+| `CustomerTests`        | przechowywanie kont, dostęp po indeksie, walidacja danych            |       4       |
+| `BankTests`            | liczenie klientów, `get_customers()`, przelew, raport sald           |       7       |
 | `TransactionTests`     | historia operacji — typ i kwota transakcji                           |       2       |
 | `MonthUpdateTests`     | miesięczne odsetki (`SavingsAccount`), opłata (`CheckingAccount`)    |       2       |
 | `StaticMethodTests`    | walidacja kwoty — metoda statyczna `is_valid_amount`                 |       3       |
-| `FileIOTests`          | zapis/odczyt JSON, brakujący plik, niepoprawny JSON, brakujące pole  |       6       |
-| **Razem**              |                                                                      |    **33**     |
+| `FileIOTests`          | zapis/odczyt JSON, historia transakcji, błędne dane wejściowe        |       7       |
+| **Razem**              |                                                                      |    **37**     |
